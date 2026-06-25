@@ -62,9 +62,12 @@
       card.innerHTML = `
         <div class="status-head">
           <div>
-            <span class="caption">contract</span>
-            <h2 style="font-size:26px;line-height:32px" class="mono">${o.tokenMint.slice(0,6)}…${o.tokenMint.slice(-6)}</h2>
-            <span class="mono muted" style="font-size:13px">${o.reference}</span>
+            ${o.tokenName || o.tokenTicker
+              ? `<h2 style="font-size:26px;line-height:32px">${o.tokenName || ""} ${o.tokenTicker ? `<span class="muted">$${o.tokenTicker}</span>` : ""}</h2>
+                 <span class="mono muted" style="font-size:13px">${o.tokenMint.slice(0,6)}…${o.tokenMint.slice(-6)} · ${o.reference}</span>`
+              : `<span class="caption">contract</span>
+                 <h2 style="font-size:26px;line-height:32px" class="mono">${o.tokenMint.slice(0,6)}…${o.tokenMint.slice(-6)}</h2>
+                 <span class="mono muted" style="font-size:13px">${o.reference}</span>`}
           </div>
           <span class="badge ${o.status}">${STATUS_LABEL[o.status] || o.status}</span>
         </div>

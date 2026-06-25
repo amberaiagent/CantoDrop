@@ -13,6 +13,7 @@ import {
   ORDER_STATUSES,
   milestonePreview,
 } from "./src/orders.js";
+import { resolveToken } from "./src/token.js";
 
 // Optional shared secret the bot sends to mutate orders. If unset (local dev),
 // the update endpoint is open so you can demo status changes by hand.
@@ -30,6 +31,12 @@ app.get("/api/config", (_req, res) => {
   res.json({ depositWallet: DEPOSIT_WALLET, defaults: DEFAULTS, limits: LIMITS });
 });
 
+// Resolve a token's name/ticker from its CA — used by the form to preview the token.
+app.get("/api/token/:mint", async (req, res) => {
+  const meta = await resolveToken(req.params.mint.trim());
+  res.json({ ok: true, found: !!(meta.ticker || meta.name), ...meta });
+});
+
 // Create an order → saved order + deposit instructions + canto preview.
 app.post("/api/orders", async (req, res) => {
   let input;
@@ -43,7 +50,9 @@ app.post("/api/orders", async (req, res) => {
   }
 
   try {
-    const order = await createOrder(input);
+    // Resolve name/ticker from the CA (cached; the form preview usually warmed it).
+    const meta = await resolveToken(input.tokenMint);
+    const order = await createOrder({ ...input, tokenName: meta.name, tokenTicker: meta.ticker });
     return res.status(201).json({
       ok: true,
       order: publicOrder(order),
@@ -127,6 +136,8 @@ function publicOrder(o) {
   return {
     reference: o.reference,
     tokenMint: o.token_mint,
+    tokenName: o.token_name ?? null,
+    tokenTicker: o.token_ticker ?? null,
     depositAmount: o.deposit_amount,
     supplyPercent: o.supply_percent,
     targetMarketCap: o.target_market_cap,

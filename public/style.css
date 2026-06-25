@@ -197,6 +197,9 @@ input::placeholder { color: var(--ink-muted); }
 input:focus { outline: none; border-color: var(--cobalt); box-shadow: 0 0 0 3px rgba(61,90,241,.16); }
 input.invalid { border-color: var(--signal-amber); }
 .hint { font-size: 13px; color: var(--ink-muted); margin-top: var(--s2); }
+.token-found { font-size: 13px; margin-top: var(--s2); color: var(--ink-muted); min-height: 18px; }
+.token-found.ok { color: var(--cobalt); font-family: var(--font-mono); }
+.token-found.dim { color: var(--ink-muted); }
 .err { font-size: 13px; color: var(--signal-amber); margin-top: var(--s2); min-height: 0; }
 .form-error { display: block; color: var(--signal-amber); text-align: center; margin-top: var(--s3); }
 .advanced { border: 1px solid var(--line); border-radius: var(--r-input); padding: 12px 14px; background: var(--white); margin: var(--s2) 0 var(--s3); }
@@ -224,6 +227,8 @@ input.invalid { border-color: var(--signal-amber); }
 .pool-row:last-child { border-bottom: none; }
 .pool-row.head { color: var(--ink-muted); font-size: 12px; letter-spacing: 0.06em; text-transform: uppercase; }
 .pool-row .ca { font-family: var(--font-mono); font-size: 14px; color: var(--navy); }
+.pool-row .ca .tkr { font-family: var(--font-body); color: var(--cobalt); font-weight: 600; }
+.pool-row .ca .castub { color: var(--ink-muted); font-size: 13px; }
 .pool-row .num { font-family: var(--font-mono); font-size: 14px; color: var(--navy); }
 .pool-row a.ca:hover { color: var(--cobalt); }
 .pool-empty { padding: var(--s5); text-align: center; color: var(--ink-muted); }

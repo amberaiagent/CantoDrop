@@ -26,6 +26,8 @@ export async function createOrder(input) {
   const order = {
     reference,
     token_mint: input.tokenMint,
+    token_name: input.tokenName ?? null,
+    token_ticker: input.tokenTicker ?? null,
     deposit_amount: input.depositAmount,
     supply_percent: input.supplyPercent,
     target_market_cap: input.targetMarketCap,

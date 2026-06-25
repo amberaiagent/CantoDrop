@@ -79,6 +79,83 @@ function computePreview() {
 }
 form.addEventListener("input", computePreview);
 
+// ── supply ⇄ percent linking ────────────────────────────────────────────
+// Most tokens are 1,000,000,000 supply (so 10,000,000 = 1%). If the CA resolves
+// to a real total supply, we use that instead.
+const DEFAULT_SUPPLY = 1_000_000_000;
+let totalSupply = DEFAULT_SUPPLY;
+const depEl = $("depositAmount");
+const pctEl = $("supplyPercent");
+const basisEl = $("supply-basis");
+let syncing = false;
+
+const toInt = (s) => Math.floor(Number(String(s).replace(/[, _]/g, "")) || 0);
+const trimPct = (n) => {
+  // up to 4 decimals, no trailing zeros
+  return parseFloat(n.toFixed(4)).toString();
+};
+function setBasis(real) {
+  basisEl.textContent = real
+    ? `Tokens and % are linked. Based on this token's supply of ${fmt(totalSupply)}.`
+    : `Tokens and % are linked. Based on a ${fmt(DEFAULT_SUPPLY)} supply (paste a CA to use its real supply).`;
+}
+// percent → tokens
+pctEl.addEventListener("input", () => {
+  if (syncing) return;
+  const p = Number(pctEl.value);
+  if (pctEl.value === "" || !Number.isFinite(p)) return;
+  syncing = true;
+  depEl.value = Math.round((totalSupply * p) / 100);
+  syncing = false;
+});
+// tokens → percent
+depEl.addEventListener("input", () => {
+  if (syncing) return;
+  const a = toInt(depEl.value);
+  if (depEl.value === "" || !(totalSupply > 0)) return;
+  syncing = true;
+  pctEl.value = a > 0 ? trimPct((a / totalSupply) * 100) : "";
+  syncing = false;
+});
+
+// ── resolve token name/ticker (and real supply) from the CA as you type ──
+const tokenFound = $("token-found");
+const SOLANA_RE = /^[1-9A-HJ-NP-Za-km-z]{32,44}$/;
+let tokenTimer = null;
+$("tokenMint").addEventListener("input", (e) => {
+  const mint = e.target.value.trim();
+  tokenFound.textContent = "";
+  tokenFound.className = "token-found";
+  clearTimeout(tokenTimer);
+  if (!SOLANA_RE.test(mint)) { totalSupply = DEFAULT_SUPPLY; setBasis(false); return; }
+  tokenFound.textContent = "Looking up token…";
+  tokenTimer = setTimeout(async () => {
+    try {
+      const r = await (await fetch("/api/token/" + encodeURIComponent(mint))).json();
+      if (r.found) {
+        tokenFound.className = "token-found ok";
+        tokenFound.textContent = `✓ ${r.name || ""}${r.ticker ? ` ($${r.ticker})` : ""}`.trim();
+      } else {
+        tokenFound.className = "token-found dim";
+        tokenFound.textContent = "Token not listed yet. You can still create the order.";
+      }
+      // adopt the real supply if we got one, and re-derive the linked field
+      totalSupply = r.totalSupply > 0 ? r.totalSupply : DEFAULT_SUPPLY;
+      setBasis(r.totalSupply > 0);
+      if (pctEl.value !== "") {
+        syncing = true; depEl.value = Math.round((totalSupply * Number(pctEl.value)) / 100); syncing = false;
+      } else if (depEl.value !== "") {
+        const a = toInt(depEl.value);
+        syncing = true; pctEl.value = a > 0 ? trimPct((a / totalSupply) * 100) : ""; syncing = false;
+      }
+      computePreview();
+    } catch {
+      tokenFound.textContent = "";
+    }
+  }, 450);
+});
+setBasis(false);
+
 // ── submit ──────────────────────────────────────────────────────────────
 form.addEventListener("submit", async (e) => {
   e.preventDefault();
@@ -100,6 +177,10 @@ form.addEventListener("submit", async (e) => {
     openConfirm(json);
     pushToast(json.order);
     form.reset();
+    tokenFound.textContent = "";
+    tokenFound.className = "token-found";
+    totalSupply = DEFAULT_SUPPLY;
+    setBasis(false);
     computePreview();
     loadPool(true);
   } catch {
@@ -113,7 +194,11 @@ form.addEventListener("submit", async (e) => {
 // ── confirmation modal ──────────────────────────────────────────────────
 function openConfirm({ order, deposit, preview }) {
   $("ok-ref").textContent = order.reference;
+  const tokenLine = order.tokenName || order.tokenTicker
+    ? ci("Token", `${order.tokenName || ""}${order.tokenTicker ? ` ($${order.tokenTicker})` : ""}`.trim())
+    : "";
   $("confirm-grid").innerHTML = `
+    ${tokenLine}
     ${ci("Contract (CA)", order.tokenMint)}
     ${ci("Supply to send", fmt(deposit.amount) + " tokens")}
     ${ci("Target cap", fmtUsd(order.targetMarketCap))}
@@ -158,7 +243,7 @@ function pushToast(order) {
   el.className = "toast";
   el.innerHTML = `
     <div class="t-top"><span class="t-ref">${order.reference}</span><span class="badge active">in progress</span></div>
-    <div class="t-body">Order submitted · <b>${fmt(order.depositAmount)}</b> tokens · ${shortCa(order.tokenMint)}</div>`;
+    <div class="t-body">Order submitted · <b>${fmt(order.depositAmount)}</b> ${order.tokenTicker ? "$"+order.tokenTicker : "tokens"} · ${shortCa(order.tokenMint)}</div>`;
   stack.appendChild(el);
   setTimeout(() => { el.style.transition = "opacity .4s"; el.style.opacity = "0"; setTimeout(() => el.remove(), 400); }, 6000);
 }
@@ -186,9 +271,12 @@ function renderPool(orders) {
     poolBody.innerHTML = filtered.map((o) => {
       const isNew = !firstPoolLoad && !seen.has(o.reference);
       const pct = o.targetMarketCap > 0 ? Math.min(100, (Number(o.currentMarketCap) / Number(o.targetMarketCap)) * 100) : 0;
+      const tk = o.tokenTicker ? `$${o.tokenTicker}` : "";
       return `
       <div class="pool-row ${isNew ? "new" : ""}">
-        <a class="ca" href="/order/${o.reference}" title="${o.tokenMint}">${shortCa(o.tokenMint)}</a>
+        <a class="ca" href="/order/${o.reference}" title="${o.tokenMint}">
+          ${tk ? `<b class="tkr">${tk}</b> ` : ""}<span class="castub">${shortCa(o.tokenMint)}</span>
+        </a>
         <span class="num">${fmt(o.depositAmount)}</span>
         <span class="num col-target">${fmtUsd(o.targetMarketCap)}</span>
         <span class="col-progress"><span class="prog"><i style="width:${pct}%"></i></span></span>

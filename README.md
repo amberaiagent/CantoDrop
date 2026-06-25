@@ -39,7 +39,7 @@ at the DB instead of the in-memory `Map`.
   (default `H34PbZN5gxckdVs9wSEvtF4oVcXrzwXQtgMiwtYCJBAH`)
 
 ## Flow
-1. Dev fills the form (just the **CA**, supply amount, target cap; advanced: holder range, multiplier, split). Name/ticker are resolved on-chain by the bot.
+1. Dev fills the form (just the **CA**, supply amount, target cap; advanced: holder range, multiplier, split). The site resolves the token **name + ticker from the CA via DexScreener** (shown live under the field and stored on the order).
 2. `POST /api/orders` validates, inserts a `pending` row, returns a **deposit wallet + memo code**.
 3. Dev sends the tokens to the wallet **with that memo**.
 4. Your bot watches the wallet, matches the incoming SPL transfer by **memo + token mint**,
@@ -50,6 +50,7 @@ at the DB instead of the in-memory `Map`.
 | Method | Path | Purpose |
 | --- | --- | --- |
 | `GET`  | `/api/config` | platform defaults + limits (used by the form) |
+| `GET`  | `/api/token/:mint` | resolve a token's `name` + `ticker` from its CA (DexScreener, Solana base-token only) |
 | `POST` | `/api/orders` | create an order → `{ order, deposit:{wallet,memo,amount,tokenMint}, preview }` |
 | `GET`  | `/api/orders` | list every order, newest first (powers the public Live Pool) |
 | `GET`  | `/api/orders/:reference` | fetch one order + canto schedule |

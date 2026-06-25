@@ -200,6 +200,7 @@
             <div class="field">
               <label for="tokenMint">Token contract address (CA) <span class="req">*</span></label>
               <input id="tokenMint" name="tokenMint" placeholder="Solana mint, e.g. 7xKX…gAsU" autocomplete="off" spellcheck="false" />
+              <small class="token-found" id="token-found"></small>
               <small class="err" data-err="tokenMint"></small>
             </div>
             <div class="row">
@@ -209,11 +210,12 @@
                 <small class="err" data-err="depositAmount"></small>
               </div>
               <div class="field">
-                <label for="supplyPercent">% of supply <span class="opt">(optional)</span></label>
+                <label for="supplyPercent">% of supply <span class="opt">(auto)</span></label>
                 <input id="supplyPercent" name="supplyPercent" inputmode="decimal" placeholder="10" autocomplete="off" />
                 <small class="err" data-err="supplyPercent"></small>
               </div>
             </div>
+            <small class="hint" id="supply-basis">Tokens and % are linked. Based on a 1,000,000,000 supply (paste a CA to use its real supply).</small>
             <div class="field">
               <label for="targetMarketCap">Target market cap (USD) <span class="req">*</span></label>
               <input id="targetMarketCap" name="targetMarketCap" inputmode="numeric" placeholder="50000" autocomplete="off" />
@@ -299,7 +301,7 @@
         <img class="brand-logo footer-logo" src="/canto.png" alt="canto" />
       </a>
       <div class="footer-links">
-        <a href="#">docs</a><a href="https://x.com/Canto_Drop" target="_blank" rel="noopener">twitter</a><a href="#pool">live pool</a>
+        <a href="#">docs</a><a href="https://x.com/CantoDrop_" target="_blank" rel="noopener">twitter</a><a href="#pool">live pool</a>
       </div>
       <span class="verified"><i class="dotk"></i> contract verified</span>
     </div>
