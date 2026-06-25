@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>canto · no cap, just drops</title>
+  <meta name="description" content="Automated, market-cap-triggered token drops on Solana. Lock supply, set a target cap, and holders #1–#200 get an even cut at every ×2." />
+  <link rel="icon" type="image/png" href="/favicon.png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;600&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/style.css" />
+</head>
+<body>
+
+  <!-- ───────── NAV ───────── -->
+  <header class="nav">
+    <div class="wrap nav-inner">
+      <a class="brand" href="/">
+        <img class="brand-logo" src="/canto.png" alt="canto" />
+      </a>
+      <nav class="nav-links">
+        <a href="#mechanism">mechanism</a>
+        <a href="#ladder">the ladder</a>
+        <a href="#pool">live pool</a>
+        <a href="#faq">faq</a>
+        <a href="#create" class="btn btn-primary">Create an order</a>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <!-- ───────── HERO ───────── -->
+    <section class="wrap hero">
+      <div class="hero-grid">
+        <div>
+          <div class="hero-tag"><span class="pulse"></span> Solana · automated drops</div>
+          <h1>No cap,<br/>just drops.</h1>
+          <p class="lede">Lock part of your supply and set a target market cap. Hit it, and holders <b>#1–#200</b> get an even cut, then again at every <b>×2</b>. Transparent pool, public dashboard.</p>
+          <div class="hero-cta">
+            <a href="#create" class="btn btn-primary">Create an order</a>
+            <a href="#pool" class="btn btn-ghost">View live pool</a>
+          </div>
+        </div>
+        <div class="ladder-wrap" aria-hidden="true">
+          <!-- doubling ladder, expanded into a diagram -->
+          <svg class="ladder-diagram" viewBox="0 0 800 340" role="img" aria-label="Cap doubling ladder">
+            <!-- baseline -->
+            <line x1="20" y1="312" x2="780" y2="312" stroke="var(--hairline-strong)" stroke-width="1"/>
+            <!-- steps: heights grow as the cap doubles -->
+            <!-- col width 140, gap 15, x0 = 20 -->
+            <g>
+              <rect class="ld-step" x="20"  y="272" width="140" height="40"/>
+              <rect class="ld-step" x="175" y="237" width="140" height="75"/>
+              <rect class="ld-step" x="330" y="182" width="140" height="130"/>
+              <rect class="ld-step" x="485" y="112" width="140" height="200"/>
+              <rect class="ld-step" x="640" y="27"  width="140" height="285"/>
+            </g>
+            <!-- snapshot dots on each step top -->
+            <circle class="ld-snapshot" cx="90"  cy="272" r="5"/>
+            <circle class="ld-snapshot" cx="245" cy="237" r="5"/>
+            <circle class="ld-snapshot" cx="400" cy="182" r="5"/>
+            <circle class="ld-snapshot" cx="555" cy="112" r="5"/>
+            <circle class="ld-snapshot" cx="710" cy="27"  r="5"/>
+            <!-- progress line drawn across the snapshot points -->
+            <polyline class="ld-progress" points="90,272 245,237 400,182 555,112 710,27"/>
+            <!-- canto labels -->
+            <text class="ld-canto" x="90"  y="300" text-anchor="middle">Canto I</text>
+            <text class="ld-canto" x="245" y="300" text-anchor="middle">Canto II</text>
+            <text class="ld-canto" x="400" y="300" text-anchor="middle">Canto III</text>
+            <text class="ld-canto" x="555" y="300" text-anchor="middle">Canto IV</text>
+            <text class="ld-canto" x="710" y="300" text-anchor="middle">Canto V</text>
+            <!-- cap labels -->
+            <text class="ld-label" x="90"  y="262" text-anchor="middle">$50k</text>
+            <text class="ld-label" x="245" y="227" text-anchor="middle">$100k</text>
+            <text class="ld-label" x="400" y="172" text-anchor="middle">$200k</text>
+            <text class="ld-label" x="555" y="102" text-anchor="middle">$400k</text>
+            <text class="ld-label" x="710" y="17"  text-anchor="middle">$800k</text>
+          </svg>
+          <div class="ladder-legend">
+            <span><i class="dotk" style="background:var(--canto-blue)"></i> snapshot taken</span>
+            <span><i class="dotk" style="background:var(--ink-2)"></i> cap step ×2</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ───────── CANTO I — THE MECHANISM ───────── -->
+    <section class="wrap section" id="mechanism">
+      <div class="canto-head">
+        <div class="canto-num">I</div>
+        <div class="ch-body">
+          <span class="ch-kicker">the mechanism</span>
+          <h2>Three moves, then it runs itself.</h2>
+        </div>
+      </div>
+      <div class="steps">
+        <div class="step">
+          <svg class="step-i ladder-mark" viewBox="0 0 40 32" style="height:30px"><rect class="bar" x="2" y="20" width="9" height="10" rx="1"/><rect class="bar" x="15" y="20" width="9" height="10" rx="1"/><rect class="bar" x="28" y="20" width="9" height="10" rx="1"/></svg>
+          <h3>Lock supply</h3>
+          <p>Paste your token CA and send the slice of supply you want to drop into the public pool wallet. It's held, never spent on anything else.</p>
+        </div>
+        <div class="step">
+          <svg class="step-i ladder-mark" viewBox="0 0 40 32" style="height:30px"><rect class="bar" x="2" y="22" width="9" height="8" rx="1"/><rect class="bar" x="15" y="14" width="9" height="16" rx="1"/><rect class="bar" x="28" y="6" width="9" height="24" rx="1"/></svg>
+          <h3>Hit the cap</h3>
+          <p>You set a target market cap. Nothing happens until the token reaches it on-chain. The trigger is the cap, not a date or a promise.</p>
+        </div>
+        <div class="step">
+          <svg class="step-i ladder-mark" viewBox="0 0 40 32" style="height:30px"><circle class="dot" cx="8" cy="8" r="3"/><rect class="bar" x="4" y="14" width="8" height="16" rx="1"/><circle class="dot" cx="30" cy="8" r="3"/><rect class="bar" x="26" y="14" width="8" height="16" rx="1"/></svg>
+          <h3>Snapshot + drop</h3>
+          <p>At the cap, holders #1–#200 (minus the LP) are snapshotted and split an even cut. At every ×2 after, a fresh snapshot and the next half of what's left.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ───────── CANTO II — THE LADDER ───────── -->
+    <section class="wrap section" id="ladder">
+      <div class="canto-head">
+        <div class="canto-num">II</div>
+        <div class="ch-body">
+          <span class="ch-kicker">the ladder</span>
+          <h2>Every ×2 is a new canto.</h2>
+        </div>
+      </div>
+      <p class="muted" style="max-width:62ch;margin:0 0 24px">
+        The cap climbs in doublings. Each rung fires a round, a <b style="color:var(--navy);font-weight:500">canto</b>, that snapshots holders again and distributes the next portion of the locked supply. Default is 50% of the remaining balance per rung, so payouts taper as the cap grows.
+      </p>
+      <div class="ladder-wrap">
+        <svg class="ladder-diagram" viewBox="0 0 800 300" role="img" aria-label="Distribution per canto round">
+          <line x1="20" y1="270" x2="780" y2="270" stroke="var(--hairline-strong)" stroke-width="1"/>
+          <!-- each bar = portion dropped that round (50%, 25%, 12.5% ...) -->
+          <rect class="ld-fill" x="40"  y="40"  width="120" height="230"/>
+          <rect class="ld-fill" x="200" y="155" width="120" height="115"/>
+          <rect class="ld-fill" x="360" y="212" width="120" height="58"/>
+          <rect class="ld-fill" x="520" y="241" width="120" height="29"/>
+          <rect class="ld-fill" x="680" y="241" width="120" height="29"/>
+          <circle class="ld-snapshot" cx="100" cy="40"  r="5"/>
+          <circle class="ld-snapshot" cx="260" cy="155" r="5"/>
+          <circle class="ld-snapshot" cx="420" cy="212" r="5"/>
+          <circle class="ld-snapshot" cx="580" cy="241" r="5"/>
+          <circle class="ld-snapshot" cx="740" cy="241" r="5"/>
+          <text class="ld-canto" x="100" y="292" text-anchor="middle">Canto I</text>
+          <text class="ld-canto" x="260" y="292" text-anchor="middle">Canto II</text>
+          <text class="ld-canto" x="420" y="292" text-anchor="middle">Canto III</text>
+          <text class="ld-canto" x="580" y="292" text-anchor="middle">Canto IV</text>
+          <text class="ld-canto" x="740" y="292" text-anchor="middle">Canto V</text>
+          <text class="ld-label" x="100" y="32"  text-anchor="middle">50%</text>
+          <text class="ld-label" x="260" y="147" text-anchor="middle">25%</text>
+          <text class="ld-label" x="420" y="204" text-anchor="middle">12.5%</text>
+          <text class="ld-label" x="580" y="233" text-anchor="middle">6.25%</text>
+          <text class="ld-label" x="740" y="233" text-anchor="middle">rest</text>
+        </svg>
+        <div class="ladder-legend">
+          <span><i class="dotk" style="background:var(--canto-blue)"></i> snapshot + drop</span>
+          <span><i class="dotk" style="background:var(--canto-blue-dim)"></i> portion of locked supply</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- ───────── CANTO III — THE HOLDERS ───────── -->
+    <section class="wrap section" id="holders">
+      <div class="canto-head">
+        <div class="canto-num">III</div>
+        <div class="ch-body">
+          <span class="ch-kicker">the holders</span>
+          <h2>Who actually gets the drop.</h2>
+        </div>
+      </div>
+      <div class="holders-grid">
+        <div>
+          <p>Every holder from <b>#1 to #200</b> is in. The only wallet skipped is the <b>liquidity pool</b>, because dropping tokens back into the LP isn't a reward to anyone.</p>
+          <p>The cut is split <b>evenly</b>, so a rank-1 wallet and a rank-200 wallet receive the same. No weighting, no games.</p>
+          <p class="caption" style="margin-top:24px">The range is configurable per order in advanced settings, but the default #1 to #200 is the platform norm.</p>
+        </div>
+        <div class="rank-viz">
+          <div class="rank-row rank-excluded"><span class="rk">LP</span><span class="rank-bar" style="max-width:55%"></span></div>
+          <div class="rank-row rank-included"><span class="rk">#1</span><span class="rank-bar"></span></div>
+          <div class="rank-row rank-included"><span class="rk">#60</span><span class="rank-bar"></span></div>
+          <div class="rank-row rank-included"><span class="rk">#120</span><span class="rank-bar"></span></div>
+          <div class="rank-row rank-included"><span class="rk">#200</span><span class="rank-bar"></span></div>
+          <div class="rank-row rank-excluded"><span class="rk">#201+</span><span class="rank-bar" style="max-width:40%"></span></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ───────── CREATE ───────── -->
+    <section class="wrap section" id="create">
+      <div class="canto-head">
+        <div class="canto-num">∎</div>
+        <div class="ch-body">
+          <span class="ch-kicker">create an order</span>
+          <h2>Open a drop.</h2>
+        </div>
+      </div>
+      <div class="create-grid">
+        <div class="panel">
+          <h3>Order details</h3>
+          <p class="muted" style="font-size:15px">Just the contract address. Name, ticker and supply are read from the chain. You'll get a pool address and a memo on the next screen.</p>
+          <form id="order-form" novalidate>
+            <div class="field">
+              <label for="tokenMint">Token contract address (CA) <span class="req">*</span></label>
+              <input id="tokenMint" name="tokenMint" placeholder="Solana mint, e.g. 7xKX…gAsU" autocomplete="off" spellcheck="false" />
+              <small class="err" data-err="tokenMint"></small>
+            </div>
+            <div class="row">
+              <div class="field">
+                <label for="depositAmount">Supply to lock (tokens) <span class="req">*</span></label>
+                <input id="depositAmount" name="depositAmount" inputmode="numeric" placeholder="100000000" autocomplete="off" />
+                <small class="err" data-err="depositAmount"></small>
+              </div>
+              <div class="field">
+                <label for="supplyPercent">% of supply <span class="opt">(optional)</span></label>
+                <input id="supplyPercent" name="supplyPercent" inputmode="decimal" placeholder="10" autocomplete="off" />
+                <small class="err" data-err="supplyPercent"></small>
+              </div>
+            </div>
+            <div class="field">
+              <label for="targetMarketCap">Target market cap (USD) <span class="req">*</span></label>
+              <input id="targetMarketCap" name="targetMarketCap" inputmode="numeric" placeholder="50000" autocomplete="off" />
+              <small class="hint">First snapshot fires here. Each canto after is ×<span class="mult-echo">2</span> of the cap.</small>
+              <small class="err" data-err="targetMarketCap"></small>
+            </div>
+
+            <details class="advanced">
+              <summary>Advanced distribution</summary>
+              <p class="caption" style="margin:0 0 12px">Defaults follow the platform rules. Override only if you know what you want.</p>
+              <div class="row">
+                <div class="field"><label for="holderTopFrom">Holders from rank</label><input id="holderTopFrom" name="holderTopFrom" inputmode="numeric" placeholder="1" /><small class="err" data-err="holderTopFrom"></small></div>
+                <div class="field"><label for="holderTopTo">Holders to rank</label><input id="holderTopTo" name="holderTopTo" inputmode="numeric" placeholder="200" /><small class="err" data-err="holderTopTo"></small></div>
+              </div>
+              <div class="row">
+                <div class="field"><label for="capMultiplier">Cap multiplier</label><input id="capMultiplier" name="capMultiplier" inputmode="decimal" placeholder="2" /><small class="err" data-err="capMultiplier"></small></div>
+                <div class="field"><label for="splitPercent">% of remaining / canto</label><input id="splitPercent" name="splitPercent" inputmode="decimal" placeholder="50" /><small class="err" data-err="splitPercent"></small></div>
+              </div>
+            </details>
+
+            <button type="submit" class="btn btn-primary btn-block" id="submit-btn">Create order</button>
+            <small class="form-error" id="form-error"></small>
+          </form>
+          <p class="lookup">Have an order code? <a href="#" id="lookup-link">Check its status →</a></p>
+        </div>
+
+        <aside class="panel preview-panel" id="live-preview">
+          <h3>Canto schedule</h3>
+          <div id="preview-body"><p class="preview-empty">Enter supply and a target cap to preview the rounds.</p></div>
+        </aside>
+      </div>
+    </section>
+
+    <!-- ───────── LIVE POOL ───────── -->
+    <section class="wrap section" id="pool">
+      <div class="canto-head">
+        <div class="canto-num">◆</div>
+        <div class="ch-body">
+          <span class="ch-kicker">live pool</span>
+          <h2>Every order, in the open.</h2>
+        </div>
+      </div>
+      <div class="pool-head">
+        <p class="muted" style="margin:0">New orders appear here the moment they're created. Transparent by design.</p>
+        <div class="pool-filters" id="pool-filters">
+          <button class="chip active" data-filter="all">all</button>
+          <button class="chip" data-filter="pending">waiting</button>
+          <button class="chip" data-filter="active">active</button>
+          <button class="chip" data-filter="completed">completed</button>
+        </div>
+      </div>
+      <div class="pool" id="pool">
+        <div class="pool-row head">
+          <span>contract</span><span>supply locked</span><span class="col-target">target mcap</span><span class="col-progress">progress</span><span>status</span>
+        </div>
+        <div id="pool-body"><div class="pool-empty">Loading orders…</div></div>
+      </div>
+    </section>
+
+    <!-- ───────── FAQ ───────── -->
+    <section class="wrap section" id="faq">
+      <div class="canto-head">
+        <div class="canto-num">?</div>
+        <div class="ch-body">
+          <span class="ch-kicker">faq</span>
+          <h2>Straight answers.</h2>
+        </div>
+      </div>
+      <div class="faq">
+        <details open><summary>How does a deposit reach my order?</summary><p>You send the locked supply to one public pool wallet and include the memo code we give you. The bot matches the incoming transfer by that memo and your token's mint, then marks the order funded.</p></details>
+        <details><summary>Which holders are included in a snapshot?</summary><p>Every holder ranked #1 to #200 at snapshot time. The only wallet excluded is the liquidity pool, so the drop never just recycles tokens back into the LP. The range is adjustable per order.</p></details>
+        <details><summary>What does "every ×2" mean exactly?</summary><p>After the first snapshot at your target cap, a new canto fires each time the market cap doubles. Each canto takes a fresh holder snapshot and drops the next portion (50% of the remaining balance by default).</p></details>
+        <details><summary>Is anything custodial?</summary><p>The locked supply sits in the public pool wallet until its cantos fire. Every order and its rounds are visible on the live pool, so nothing happens off the books.</p></details>
+        <details><summary>Do I need to connect a wallet?</summary><p>No. You create the order with just the CA and send the supply manually with the memo. No signing on the site.</p></details>
+      </div>
+    </section>
+  </main>
+
+  <!-- ───────── FOOTER ───────── -->
+  <footer class="footer">
+    <div class="wrap footer-inner">
+      <a class="brand" href="/">
+        <img class="brand-logo footer-logo" src="/canto.png" alt="canto" />
+      </a>
+      <div class="footer-links">
+        <a href="#">docs</a><a href="https://x.com/Canto_Drop" target="_blank" rel="noopener">twitter</a><a href="#pool">live pool</a>
+      </div>
+      <span class="verified"><i class="dotk"></i> contract verified</span>
+    </div>
+  </footer>
+
+  <!-- confirmation modal -->
+  <div class="modal" id="confirm-modal" hidden>
+    <div class="modal-card">
+      <button class="modal-close" id="modal-close" aria-label="Close">×</button>
+      <div class="ok-row"><span class="badge">order created</span><span class="caption" id="ok-ref"></span></div>
+      <h2 style="font-size:26px;line-height:32px">Fund the drop</h2>
+      <p class="muted" style="font-size:15px">Send the supply to the pool wallet <b style="color:var(--navy)">with the memo</b>. The bot matches your deposit by it.</p>
+      <div class="confirm-grid" id="confirm-grid"></div>
+      <div class="copyblock"><span class="cb-label">Pool wallet</span><code id="cb-wallet"></code><button class="btn btn-ghost btn-copy" data-copy="cb-wallet">Copy</button></div>
+      <div class="copyblock key"><span class="cb-label">Memo (required)</span><code id="cb-memo"></code><button class="btn btn-ghost btn-copy" data-copy="cb-memo">Copy</button></div>
+      <div class="warn">⚠ The memo is required. A transfer without it can't be matched to your order automatically.</div>
+      <div id="confirm-preview"></div>
+      <a class="btn btn-primary btn-block" id="goto-status" href="#" style="margin-top:16px">Go to order status →</a>
+    </div>
+  </div>
+
+  <!-- toast feed -->
+  <div class="toast-stack" id="toast-stack"></div>
+
+  <script src="/app.js"></script>
+</body>
+</html>

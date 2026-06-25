@@ -1,0 +1,12 @@
+node_modules/
+
+# local editor / preview tooling
+.claude/
+
+# secrets: never commit any real .env
+.env
+.env.*
+!.env.example
+
+*.log
+.DS_Store

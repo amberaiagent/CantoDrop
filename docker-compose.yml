@@ -1,0 +1,27 @@
+services:
+  web:
+    build: .
+    # Reads PORT, DEPOSIT_WALLET, ADMIN_TOKEN, (later) DATABASE_URL from .env
+    env_file:
+      - .env
+    ports:
+      - "${PORT:-3000}:3000"
+    restart: unless-stopped
+
+  # ─────────────────────────────────────────────────────────────────────
+  # Uncomment when you switch order storage from in-memory to PostgreSQL.
+  # Then set DATABASE_URL=postgres://canto:canto@db:5432/canto_drop in .env
+  # and run `npm run db:init` once (or exec it inside the web container).
+  # ─────────────────────────────────────────────────────────────────────
+  # db:
+  #   image: postgres:16-alpine
+  #   environment:
+  #     POSTGRES_USER: canto
+  #     POSTGRES_PASSWORD: canto
+  #     POSTGRES_DB: canto_drop
+  #   volumes:
+  #     - canto_pgdata:/var/lib/postgresql/data
+  #   restart: unless-stopped
+
+# volumes:
+#   canto_pgdata:

@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>admin · canto</title>
+  <link rel="icon" type="image/png" href="/favicon.png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;600&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/style.css" />
+  <style>
+    .admin-head { display:flex; align-items:flex-end; justify-content:space-between; gap:16px; flex-wrap:wrap; margin-bottom:8px; }
+    .token-bar { display:flex; align-items:center; gap:8px; }
+    .token-bar input { width:200px; font-family:var(--font-mono); font-size:13px; }
+    .ord { margin-bottom:16px; }
+    .ord-top { display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap; margin-bottom:14px; }
+    .ord-top .ca { font-family:var(--font-mono); font-size:15px; color:var(--navy); }
+    .ord-meta { display:flex; gap:24px; flex-wrap:wrap; margin-bottom:16px; }
+    .ord-meta .mi .l { font-size:12px; color:var(--ink-muted); display:block; }
+    .ord-meta .mi .v { font-family:var(--font-mono); font-size:14px; color:var(--navy); }
+    .controls { display:grid; grid-template-columns: repeat(auto-fit, minmax(150px,1fr)); gap:14px; align-items:end; }
+    .controls .field { margin:0; }
+    .controls label { font-size:12px; }
+    .status-set { display:flex; gap:8px; flex-wrap:wrap; margin-top:14px; }
+    .status-set .chip { font-weight:600; }
+    .status-set .chip.cur { color:#fff; background:var(--cobalt); border-color:var(--cobalt); cursor:default; }
+    .saved { color:var(--cobalt); font-size:13px; margin-left:8px; opacity:0; transition:opacity .2s; }
+    .saved.show { opacity:1; }
+    .empty { color:var(--on-blue-muted); text-align:center; padding:40px; }
+    /* lock gate */
+    .lock { position:fixed; inset:0; z-index:80; display:grid; place-items:center; background:var(--cobalt); padding:24px; }
+    .lock-card { background:var(--white); border-radius:var(--r-card); padding:40px; max-width:380px; width:100%; text-align:center; }
+    .lock-card h2 { font-size:28px; margin-bottom:8px; }
+    .lock-card p { color:var(--ink-muted); margin:0 0 20px; font-size:14px; }
+    .lock-card input { font-family:var(--font-mono); margin-bottom:12px; text-align:center; }
+    .lock-err { color:var(--signal-amber); font-size:13px; min-height:18px; margin-top:8px; }
+    #app { display:none; }
+  </style>
+</head>
+<body>
+  <!-- password gate -->
+  <div class="lock" id="lock">
+    <div class="lock-card">
+      <img class="brand-logo" src="/canto.png" alt="canto" style="height:64px;margin:0 auto 12px;filter:none;" />
+      <h2>Control panel</h2>
+      <p>Enter the admin password to manage orders.</p>
+      <input id="pw" type="password" placeholder="password" />
+      <button class="btn btn-primary btn-block" id="unlock">Unlock</button>
+      <div class="lock-err" id="lock-err"></div>
+    </div>
+  </div>
+
+  <div id="app">
+    <header class="nav">
+      <div class="wrap nav-inner">
+        <a class="brand" href="/"><img class="brand-logo" src="/canto.png" alt="canto" /></a>
+        <nav class="nav-links">
+          <a href="/#pool">live pool</a>
+          <a href="#" id="lock-btn">lock</a>
+          <a href="/" class="btn btn-primary">Back to site</a>
+        </nav>
+      </div>
+    </header>
+
+    <main class="wrap" style="padding-top:24px;">
+      <div class="admin-head">
+        <div>
+          <h1 style="font-size:40px;color:#fff;">Control panel</h1>
+          <p style="color:var(--on-blue-muted);margin:6px 0 0;">Watch what the bot does and move each order by hand. Changes are live on the public pool instantly.</p>
+        </div>
+        <button class="btn btn-ghost" id="refresh" style="color:#fff;border-color:rgba(255,255,255,.45)">Refresh</button>
+      </div>
+
+      <section class="section">
+        <div id="orders"><p class="empty" style="color:var(--ink-muted)">Loading orders…</p></div>
+      </section>
+    </main>
+  </div>
+
+  <script>
+    const STATUSES = ["pending","funded","active","completed","cancelled"];
+    const LABEL = { pending:"waiting", funded:"funded", active:"active", completed:"completed", cancelled:"cancelled" };
+    const fmt = (n) => Number(n).toLocaleString("en-US",{maximumFractionDigits:Number(n)>=1000?0:2});
+    const fmtUsd = (n) => "$"+fmt(n);
+    const short = (c) => c.length>14 ? c.slice(0,6)+"…"+c.slice(-6) : c;
+    const $ = (id)=>document.getElementById(id);
+
+    let editing = false; // pause auto-refresh while typing in a control
+    let pollTimer = null;
+
+    // ── password gate ──────────────────────────────────────────────
+    let ADMIN_PW = localStorage.getItem("canto_admin_token") || "";
+
+    async function tryLogin(pw) {
+      const res = await fetch("/api/admin/login", {
+        method: "POST", headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ token: pw }),
+      });
+      return res.ok;
+    }
+    function openApp() {
+      $("lock").style.display = "none";
+      $("app").style.display = "block";
+      load();
+      if (!pollTimer) pollTimer = setInterval(load, 5000);
+    }
+    function lockApp() {
+      ADMIN_PW = "";
+      localStorage.removeItem("canto_admin_token");
+      if (pollTimer) { clearInterval(pollTimer); pollTimer = null; }
+      $("app").style.display = "none";
+      $("lock").style.display = "grid";
+      $("pw").value = "";
+      $("pw").focus();
+    }
+    async function unlock() {
+      const pw = $("pw").value;
+      $("lock-err").textContent = "";
+      if (await tryLogin(pw)) {
+        ADMIN_PW = pw;
+        localStorage.setItem("canto_admin_token", pw);
+        openApp();
+      } else {
+        $("lock-err").textContent = "Wrong password.";
+      }
+    }
+    $("unlock").addEventListener("click", unlock);
+    $("pw").addEventListener("keydown", (e) => { if (e.key === "Enter") unlock(); });
+    $("lock-btn").addEventListener("click", (e) => { e.preventDefault(); lockApp(); });
+
+    // auto-enter if a saved password still works
+    (async () => {
+      if (ADMIN_PW && await tryLogin(ADMIN_PW)) openApp();
+      else { $("lock").style.display = "grid"; $("pw").focus(); }
+    })();
+
+    async function load() {
+      try {
+        const { orders } = await (await fetch("/api/orders")).json();
+        render(orders || []);
+      } catch {
+        $("orders").innerHTML = '<p class="empty" style="color:var(--ink-muted)">Could not load orders.</p>';
+      }
+    }
+
+    function render(orders) {
+      if (editing) return;
+      if (!orders.length) { $("orders").innerHTML = '<p class="empty" style="color:var(--ink-muted)">No orders yet.</p>'; return; }
+      $("orders").innerHTML = orders.map(o => `
+        <div class="panel ord" data-ref="${o.reference}">
+          <div class="ord-top">
+            <div>
+              <a class="ca" href="/order/${o.reference}" target="_blank" title="${o.tokenMint}">${short(o.tokenMint)}</a>
+              <span class="caption" style="margin-left:8px">${o.reference}</span>
+            </div>
+            <span><span class="badge ${o.status}">${LABEL[o.status]}</span><span class="saved" data-saved="${o.reference}">saved ✓</span></span>
+          </div>
+          <div class="ord-meta">
+            <div class="mi"><span class="l">supply locked</span><span class="v">${fmt(o.depositAmount)}</span></div>
+            <div class="mi"><span class="l">target cap</span><span class="v">${fmtUsd(o.targetMarketCap)}</span></div>
+            <div class="mi"><span class="l">canto rounds</span><span class="v">${o.cantoRound||0}</span></div>
+          </div>
+          <div class="controls">
+            <div class="field">
+              <label>Current market cap (USD)</label>
+              <input type="number" data-f="currentMarketCap" value="${o.currentMarketCap||0}" />
+            </div>
+            <div class="field">
+              <label>Canto round fired</label>
+              <input type="number" data-f="cantoRound" value="${o.cantoRound||0}" />
+            </div>
+            <button class="btn btn-ghost" data-apply="${o.reference}">Apply cap / round</button>
+          </div>
+          <div class="status-set">
+            ${STATUSES.map(s => s===o.status
+              ? `<span class="chip cur">${LABEL[s]}</span>`
+              : `<button class="chip" data-status="${s}" data-ref="${o.reference}">→ ${LABEL[s]}</button>`
+            ).join("")}
+          </div>
+        </div>
+      `).join("");
+    }
+
+    // track focus to pause refresh
+    $("orders").addEventListener("focusin", e => { if (e.target.tagName==="INPUT") editing = true; });
+    $("orders").addEventListener("focusout", () => { setTimeout(()=>{ editing=false; }, 400); });
+
+    async function patch(ref, body) {
+      const headers = { "Content-Type":"application/json" };
+      if (ADMIN_PW) headers["x-admin-token"] = ADMIN_PW;
+      const res = await fetch("/api/orders/"+encodeURIComponent(ref), { method:"PATCH", headers, body: JSON.stringify(body) });
+      if (res.status === 401) { alert("Session expired — please unlock again."); lockApp(); return false; }
+      const json = await res.json();
+      if (!res.ok || !json.ok) { alert("Update failed: " + (json.error || res.status)); return false; }
+      const s = document.querySelector(`.saved[data-saved="${ref}"]`);
+      if (s) { s.classList.add("show"); setTimeout(()=>s.classList.remove("show"), 1200); }
+      return true;
+    }
+
+    $("orders").addEventListener("click", async (e) => {
+      const statusBtn = e.target.closest("[data-status]");
+      const applyBtn = e.target.closest("[data-apply]");
+      if (statusBtn) {
+        const ref = statusBtn.dataset.ref;
+        if (await patch(ref, { status: statusBtn.dataset.status })) load();
+      } else if (applyBtn) {
+        const ref = applyBtn.dataset.apply;
+        const card = applyBtn.closest(".ord");
+        const body = {};
+        card.querySelectorAll("input[data-f]").forEach(i => body[i.dataset.f] = Number(i.value));
+        editing = false;
+        if (await patch(ref, body)) load();
+      }
+    });
+
+    $("refresh").addEventListener("click", load);
+    // initial load + polling are started by openApp() after a successful unlock.
+  </script>
+</body>
+</html>

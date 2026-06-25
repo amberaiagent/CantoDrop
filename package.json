@@ -1,0 +1,17 @@
+{
+  "name": "canto-drop",
+  "version": "0.1.0",
+  "description": "Canto Drop — linear holder-airdrop order platform (Solana). Devs open an order, deposit token supply, and a bot drops tokens to top holders as the market cap doubles.",
+  "type": "module",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node --watch server.js",
+    "db:init": "node scripts/init-db.js"
+  },
+  "dependencies": {
+    "dotenv": "^16.4.5",
+    "express": "^4.21.2",
+    "pg": "^8.13.1"
+  }
+}
