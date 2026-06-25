@@ -323,6 +323,23 @@
     </div>
   </div>
 
+  <!-- order lookup modal -->
+  <div class="modal" id="lookup-modal" hidden>
+    <div class="modal-card" style="max-width:420px">
+      <button class="modal-close" id="lookup-close" aria-label="Close">×</button>
+      <h2 style="font-size:24px;line-height:30px">Check order status</h2>
+      <p class="muted" style="font-size:14px;margin:6px 0 18px">Enter the order code you got when you created the drop.</p>
+      <form id="lookup-form" novalidate>
+        <input id="lookup-input" placeholder="CANTO-XXXXXXXX" autocomplete="off" spellcheck="false" style="text-transform:uppercase" />
+        <small class="err" id="lookup-err" style="display:block"></small>
+        <div style="display:flex;gap:10px;margin-top:18px">
+          <button type="button" class="btn btn-ghost" id="lookup-cancel" style="flex:1">Cancel</button>
+          <button type="submit" class="btn btn-primary" style="flex:1">Open status →</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
   <!-- toast feed -->
   <div class="toast-stack" id="toast-stack"></div>
 

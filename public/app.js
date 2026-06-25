@@ -230,10 +230,27 @@ document.querySelectorAll(".btn-copy").forEach((btn) => {
 });
 
 // ── lookup ──────────────────────────────────────────────────────────────
-$("lookup-link").addEventListener("click", (e) => {
+const lookupModal = $("lookup-modal");
+const lookupInput = $("lookup-input");
+const lookupErr = $("lookup-err");
+function openLookup() {
+  lookupErr.textContent = "";
+  lookupInput.value = "";
+  lookupModal.hidden = false;
+  setTimeout(() => lookupInput.focus(), 50);
+}
+function closeLookup() { lookupModal.hidden = true; }
+
+$("lookup-link").addEventListener("click", (e) => { e.preventDefault(); openLookup(); });
+$("lookup-close").addEventListener("click", closeLookup);
+$("lookup-cancel").addEventListener("click", closeLookup);
+lookupModal.addEventListener("click", (e) => { if (e.target === lookupModal) closeLookup(); });
+document.addEventListener("keydown", (e) => { if (e.key === "Escape" && !lookupModal.hidden) closeLookup(); });
+$("lookup-form").addEventListener("submit", (e) => {
   e.preventDefault();
-  const code = prompt("Enter your order code (e.g. CANTO-XXXXXXXX):");
-  if (code && code.trim()) location.href = `/order/${encodeURIComponent(code.trim())}`;
+  const code = lookupInput.value.trim().toUpperCase();
+  if (!code) { lookupErr.textContent = "Enter your order code."; return; }
+  location.href = `/order/${encodeURIComponent(code)}`;
 });
 
 // ── toast feed (request submitted) ──────────────────────────────────────
