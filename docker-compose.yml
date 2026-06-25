@@ -1,11 +1,14 @@
 services:
   web:
     build: .
-    # Reads PORT, DEPOSIT_WALLET, ADMIN_TOKEN, (later) DATABASE_URL from .env
+    # Reads DEPOSIT_WALLET, ADMIN_TOKEN, (later) DATABASE_URL from .env.
+    # Keep PORT=3000 in .env — that's the port the app listens on INSIDE the
+    # container. The line below maps the public port (left) to it.
     env_file:
       - .env
     ports:
-      - "${PORT:-3000}:3000"
+      # publicPort:containerPort — serve on 80 so the domain works without :3000.
+      - "${HOST_PORT:-80}:3000"
     restart: unless-stopped
 
   # ─────────────────────────────────────────────────────────────────────
