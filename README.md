@@ -1,4 +1,4 @@
-# Canto Drop
+# trench
 
 Website + database for an automated **linear holder-airdrop** platform on Solana.
 

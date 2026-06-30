@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>order · canto</title>
+  <title>order · trench</title>
   <link rel="icon" type="image/png" href="/favicon.png" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -14,7 +14,8 @@
   <header class="nav">
     <div class="wrap nav-inner">
       <a class="brand" href="/">
-        <img class="brand-logo" src="/canto.png" alt="canto" />
+        <svg class="brand-mark" viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path d="M12 2C12 2 4 11 4 15.5A8 8 0 0 0 20 15.5C20 11 12 2 12 2Z" fill="currentColor"/></svg>
+        <span class="wordmark">trench</span>
       </a>
       <nav class="nav-links"><a href="/#pool">live pool</a><a href="/#create" class="btn btn-primary">Create an order</a></nav>
     </div>
@@ -56,7 +57,7 @@
         `<div class="seg ${i < fired ? "fired" : (o.status !== "pending" && i === fired ? "on" : "")}"></div>`
       ).join("");
       const previewHtml = preview.map((r, i) =>
-        `<div class="mile"><div class="m-canto">Canto ${roman(r.milestone)} <span class="m-cap">@ ${fmtUsd(r.marketCap)}${i < fired ? " · fired" : ""}</span></div><div class="m-amt">${fmt(r.dropAmount)}</div></div>`
+        `<div class="mile"><div class="m-canto">Round ${r.milestone} <span class="m-cap">@ ${fmtUsd(r.marketCap)}${i < fired ? " · fired" : ""}</span></div><div class="m-amt">${fmt(r.dropAmount)}</div></div>`
       ).join("");
 
       card.innerHTML = `
@@ -74,25 +75,25 @@
 
         ${o.status === "cancelled" ? "" : `
           <div style="margin-top:24px">
-            <div class="caption">canto progress · ${fired} of ${total} rounds fired</div>
+            <div class="caption">round progress · ${fired} of ${total} rounds fired</div>
             <div class="round-ladder">${ladder}</div>
           </div>`}
 
         <dl class="kv">
           <dt>Contract (CA)</dt><dd>${o.tokenMint}</dd>
-          <dt>Supply locked</dt><dd>${fmt(o.depositAmount)} tokens${o.supplyPercent ? ` (${o.supplyPercent}% of supply)` : ""}</dd>
+          <dt>Supply to drop</dt><dd>${fmt(o.depositAmount)} tokens${o.supplyPercent ? ` (${o.supplyPercent}% of supply)` : ""}</dd>
           ${o.fundedAmount ? `<dt>Funded</dt><dd>${fmt(o.fundedAmount)}${o.fundedTx ? ` · <a href="https://solscan.io/tx/${o.fundedTx}" target="_blank" rel="noopener">tx ↗</a>` : ""}</dd>` : ""}
           <dt>Target market cap</dt><dd>${fmtUsd(o.targetMarketCap)}</dd>
           ${Number(o.currentMarketCap) > 0 ? `<dt>Current market cap</dt><dd>${fmtUsd(o.currentMarketCap)}</dd>` : ""}
           <dt>Holder range</dt><dd>#${o.holderTopFrom}–#${o.holderTopTo}, even split</dd>
-          <dt>Snapshot step</dt><dd>×${o.capMultiplier} of cap · ${o.splitPercent}% of remaining each canto</dd>
+          <dt>Snapshot step</dt><dd>×${o.capMultiplier} of cap · ${o.splitPercent}% of remaining each round</dd>
           <dt>Pool wallet</dt><dd>${o.depositWallet}</dd>
           <dt>Created</dt><dd>${new Date(o.createdAt).toLocaleString()}</dd>
         </dl>
 
         ${o.status === "pending" ? `<div class="warn" style="margin-top:24px">⏳ Waiting for your deposit. Send ${fmt(o.depositAmount)} tokens to the pool wallet with memo <b>${o.reference}</b>.</div>` : ""}
 
-        <h3 style="font-size:17px;margin:28px 0 8px">Canto schedule</h3>
+        <h3 style="font-size:17px;margin:28px 0 8px">Drop schedule</h3>
         ${previewHtml}
       `;
     }

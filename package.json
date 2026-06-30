@@ -1,7 +1,7 @@
 {
-  "name": "canto-drop",
+  "name": "trench",
   "version": "0.1.0",
-  "description": "Canto Drop — linear holder-airdrop order platform (Solana). Devs open an order, deposit token supply, and a bot drops tokens to top holders as the market cap doubles.",
+  "description": "trench — linear holder-airdrop order platform (Solana). Devs open an order, pick a supply amount and target cap, and a bot drops tokens to holders #1–#200 as the market cap doubles.",
   "type": "module",
   "main": "server.js",
   "scripts": {

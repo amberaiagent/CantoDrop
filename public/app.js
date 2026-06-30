@@ -39,10 +39,6 @@ fetch("/api/config").then((r) => r.json()).then((cfg) => {
   CONFIG = cfg;
   const d = cfg.defaults;
   document.querySelectorAll(".mult-echo").forEach((e) => (e.textContent = d.capMultiplier));
-  $("holderTopFrom").placeholder = d.holderTopFrom;
-  $("holderTopTo").placeholder = d.holderTopTo;
-  $("capMultiplier").placeholder = d.capMultiplier;
-  $("splitPercent").placeholder = d.splitPercent;
 }).catch(() => {});
 
 // ── live canto-schedule preview (mirrors the server formula) ────────────
@@ -68,7 +64,7 @@ function computePreview() {
   previewBody.innerHTML = rows.map((r) => `
     <div class="mile">
       <div>
-        <div class="m-canto">Canto ${roman(r.m)}</div>
+        <div class="m-canto">Round ${r.m}</div>
         <div class="m-cap">at ${fmtUsd(r.cap)} cap</div>
       </div>
       <div>
@@ -207,8 +203,8 @@ function openConfirm({ order, deposit, preview }) {
   $("cb-wallet").textContent = deposit.wallet;
   $("cb-memo").textContent = deposit.memo;
   $("confirm-preview").innerHTML =
-    '<h3 style="font-size:17px;margin:18px 0 6px">Canto schedule</h3>' +
-    preview.map((r) => `<div class="mile"><div class="m-canto">Canto ${roman(r.milestone)} <span class="m-cap">@ ${fmtUsd(r.marketCap)}</span></div><div class="m-amt">${fmt(r.dropAmount)}</div></div>`).join("");
+    '<h3 style="font-size:17px;margin:18px 0 6px">Drop schedule</h3>' +
+    preview.map((r) => `<div class="mile"><div class="m-canto">Round ${r.milestone} <span class="m-cap">@ ${fmtUsd(r.marketCap)}</span></div><div class="m-amt">${fmt(r.dropAmount)}</div></div>`).join("");
   $("goto-status").href = `/order/${order.reference}`;
   modal.hidden = false;
 }

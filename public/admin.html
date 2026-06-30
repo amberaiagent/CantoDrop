@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>admin · canto</title>
+  <title>admin · trench</title>
   <link rel="icon" type="image/png" href="/favicon.png" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -42,7 +42,7 @@
   <!-- password gate -->
   <div class="lock" id="lock">
     <div class="lock-card">
-      <img class="brand-logo" src="/canto.png" alt="canto" style="height:64px;margin:0 auto 12px;filter:none;" />
+      <div style="font-family:var(--font-display);font-weight:400;font-size:30px;color:var(--navy);margin-bottom:8px;letter-spacing:-0.01em">trench</div>
       <h2>Control panel</h2>
       <p>Enter the admin password to manage orders.</p>
       <input id="pw" type="password" placeholder="password" />
@@ -54,7 +54,7 @@
   <div id="app">
     <header class="nav">
       <div class="wrap nav-inner">
-        <a class="brand" href="/"><img class="brand-logo" src="/canto.png" alt="canto" /></a>
+        <a class="brand" href="/"><svg class="brand-mark" viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path d="M12 2C12 2 4 11 4 15.5A8 8 0 0 0 20 15.5C20 11 12 2 12 2Z" fill="currentColor"/></svg><span class="wordmark">trench</span></a>
         <nav class="nav-links">
           <a href="/#pool">live pool</a>
           <a href="#" id="lock-btn">lock</a>
@@ -159,7 +159,7 @@
           <div class="ord-meta">
             <div class="mi"><span class="l">supply locked</span><span class="v">${fmt(o.depositAmount)}</span></div>
             <div class="mi"><span class="l">target cap</span><span class="v">${fmtUsd(o.targetMarketCap)}</span></div>
-            <div class="mi"><span class="l">canto rounds</span><span class="v">${o.cantoRound||0}</span></div>
+            <div class="mi"><span class="l">rounds fired</span><span class="v">${o.cantoRound||0}</span></div>
           </div>
           <div class="controls">
             <div class="field">
@@ -167,7 +167,7 @@
               <input type="number" data-f="currentMarketCap" value="${o.currentMarketCap||0}" />
             </div>
             <div class="field">
-              <label>Canto round fired</label>
+              <label>Round fired</label>
               <input type="number" data-f="cantoRound" value="${o.cantoRound||0}" />
             </div>
             <button class="btn btn-ghost" data-apply="${o.reference}">Apply cap / round</button>

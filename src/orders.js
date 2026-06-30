@@ -15,7 +15,7 @@ function makeReference() {
   const bytes = randomBytes(8);
   let code = "";
   for (const b of bytes) code += ALPHABET[b % ALPHABET.length];
-  return `CANTO-${code}`;
+  return `TRENCH-${code}`;
 }
 
 /** Create a new pending order (kept in memory). Identity is the CA only. */
