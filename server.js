@@ -119,6 +119,11 @@ app.get(["/order/:reference", "/token/:reference"], (_req, res) => {
   res.sendFile(path.join(__dirname, "public", "order.html"));
 });
 
+// /docs → public transparency page (clean URL, no .html).
+app.get("/docs", (_req, res) => {
+  res.sendFile(path.join(__dirname, "public", "docs.html"));
+});
+
 // /admin → manual control panel (move orders through statuses by hand).
 app.get("/admin", (_req, res) => {
   res.sendFile(path.join(__dirname, "public", "admin.html"));
