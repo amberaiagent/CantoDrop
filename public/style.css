@@ -121,6 +121,10 @@ h3 { font-family: var(--font-body); font-weight: 600; font-size: 21px; line-heig
 /* logo png has transparent padding, so scale up + pull margins in to fill */
 .brand-logo { height: 56px; width: auto; display: block; margin: -14px -8px; }
 .footer-logo { height: 46px; margin: -12px -8px; }
+/* wordmark PNG ("TRENCH") sits in a big transparent square — scale up + pull
+   margins in so the visible text fills the bar without blowing up layout. */
+.brandmark-img { height: 150px; width: auto; display: block; margin: -52px -26px; }
+.footer-mark { height: 120px; margin: -42px -22px; }
 .nav-links { display: flex; align-items: center; gap: var(--s5); }
 .nav-links a:not(.btn) { color: var(--on-blue-muted); font-size: 15px; }
 .nav-links a:not(.btn):hover { color: #fff; }
