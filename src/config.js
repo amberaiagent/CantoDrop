@@ -2,7 +2,7 @@
 // target cap; the distribution fields default unless overridden in advanced mode.
 
 export const DEPOSIT_WALLET =
-  process.env.DEPOSIT_WALLET || "76Ex3DWvSnXwozo1rHDeKys5KA8mzbjSV9LMy1nmHCbT";
+  process.env.DEPOSIT_WALLET || "5nss5tF1hCXZdmp9phgjPyJPrEovS5uLbqtKyy9bS3MA";
 
 export const DEFAULTS = {
   // Every holder from #1 to #1000 is included; the bot always skips the

@@ -31,7 +31,7 @@ node index.js            # starts the loop (DRY_RUN by default)
 - `RPC_URL` — Solana RPC. **Helius recommended** (holder enumeration needs an
   indexed endpoint). Free key at helius.dev.
 - `DEPOSIT_WALLET_SECRET` — private key of the pool wallet
-  (`76Ex3DWvSnXwozo1rHDeKys5KA8mzbjSV9LMy1nmHCbT`), base58 or JSON byte array.
+  (`5nss5tF1hCXZdmp9phgjPyJPrEovS5uLbqtKyy9bS3MA`), base58 or JSON byte array.
 - `API_BASE` — `https://trenchdrop.xyz`
 - `ADMIN_TOKEN` — same value as the site's `.env`.
 - `DRY_RUN` — `true` = simulate only. **Keep true until tested.**
