@@ -163,7 +163,7 @@
         <div>
           <p>Every holder from <b>#1 to #200</b> is in. The only wallet skipped is the <b>liquidity pool</b>, because dropping tokens back into the LP isn't a reward to anyone.</p>
           <p>The cut is split <b>evenly</b>, so a rank-1 wallet and a rank-200 wallet receive the same. No weighting, no games.</p>
-          <p class="caption" style="margin-top:24px">Ranks #1 to #200 (minus the LP) is the platform standard for every drop.</p>
+          <p class="caption" style="margin-top:24px">The range is configurable per order in advanced settings, but the default #1 to #200 is the platform norm.</p>
         </div>
         <div class="rank-viz">
           <div class="rank-row rank-excluded"><span class="rk">LP</span><span class="rank-bar" style="max-width:55%"></span></div>
@@ -216,6 +216,19 @@
               <small class="err" data-err="targetMarketCap"></small>
             </div>
 
+            <details class="advanced">
+              <summary>Advanced distribution</summary>
+              <p class="caption" style="margin:0 0 12px">Defaults follow the platform rules. Override only if you know what you want.</p>
+              <div class="row">
+                <div class="field"><label for="holderTopFrom">Holders from rank</label><input id="holderTopFrom" name="holderTopFrom" inputmode="numeric" placeholder="1" /><small class="err" data-err="holderTopFrom"></small></div>
+                <div class="field"><label for="holderTopTo">Holders to rank</label><input id="holderTopTo" name="holderTopTo" inputmode="numeric" placeholder="200" /><small class="err" data-err="holderTopTo"></small></div>
+              </div>
+              <div class="row">
+                <div class="field"><label for="capMultiplier">Cap multiplier</label><input id="capMultiplier" name="capMultiplier" inputmode="decimal" placeholder="2" /><small class="err" data-err="capMultiplier"></small></div>
+                <div class="field"><label for="splitPercent">% of remaining / round</label><input id="splitPercent" name="splitPercent" inputmode="decimal" placeholder="50" /><small class="err" data-err="splitPercent"></small></div>
+              </div>
+            </details>
+
             <button type="submit" class="btn btn-primary btn-block" id="submit-btn">Create order</button>
             <small class="form-error" id="form-error"></small>
           </form>
@@ -266,7 +279,7 @@
       </div>
       <div class="faq">
         <details open><summary>How does a deposit reach my order?</summary><p>You send the supply to one public pool wallet and include the memo code we give you. The bot matches the incoming transfer by that memo and your token's mint, then marks the order funded.</p></details>
-        <details><summary>Which holders are included in a snapshot?</summary><p>Every holder ranked #1 to #200 at snapshot time. The only wallet excluded is the liquidity pool, so the drop never just recycles tokens back into the LP.</p></details>
+        <details><summary>Which holders are included in a snapshot?</summary><p>Every holder ranked #1 to #200 at snapshot time. The only wallet excluded is the liquidity pool, so the drop never just recycles tokens back into the LP. The range is adjustable per order in advanced settings.</p></details>
         <details><summary>What does "every ×2" mean exactly?</summary><p>After the first snapshot at your target cap, a new round fires each time the market cap doubles. Each round takes a fresh holder snapshot and drops the next portion (50% of the remaining balance by default).</p></details>
         <details><summary>Is anything custodial?</summary><p>The supply sits in the public pool wallet until its rounds fire. Every order and its rounds are visible on the live pool, so nothing happens off the books.</p></details>
         <details><summary>Do I need to connect a wallet?</summary><p>No. You create the order with just the CA and send the supply manually with the memo. No signing on the site.</p></details>
