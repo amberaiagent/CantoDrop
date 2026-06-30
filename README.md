@@ -102,9 +102,18 @@ Table `orders` (see [`db/schema.sql`](db/schema.sql)). The bot owns these transi
   and `token_mint` == the SPL mint received. Set `status='funded'`, `funded_tx`,
   `funded_amount`, `funded_at`.
 - **Start drops:** when market cap ≥ `target_market_cap`, set `status='active'`.
-- **Distribute:** snapshot holders ranked `holder_top_from`..`holder_top_to`, split evenly.
-  Re-snapshot + drop `split_percent`% of the remaining balance at every `cap_multiplier`× of cap.
-- **Finish:** when the balance is exhausted, set `status='completed'`.
+- **Distribute (per round):** snapshot holders ranked `holder_top_from`..`holder_top_to`
+  (exclude the LP), split the round's drop **evenly**. The round amount is
+  `split_percent`% of the **remaining** balance when `split_basis='remaining'`, or
+  `split_percent`% of the **original locked amount** when `split_basis='total'`.
+  The next round fires at the next cap threshold: ×`cap_multiplier` of cap when
+  `cap_mode='multiply'`, or +`cap_step` USD from the start target when `cap_mode='step'`.
+  Run for `rounds` rounds (or until the balance is exhausted).
+- **Finish:** after the last round, set `status='completed'`.
+
+New order fields the bot reads: `rounds`, `split_basis` (`remaining`|`total`),
+`cap_mode` (`multiply`|`step`), `cap_step`, alongside the existing
+`split_percent`, `cap_multiplier`, `holder_top_from`, `holder_top_to`.
 
 All numeric columns are returned as exact decimal **strings** by `pg` (token amounts can exceed
 2^53) — keep them as strings / BigInt in the bot.
