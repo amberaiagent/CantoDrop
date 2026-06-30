@@ -163,6 +163,12 @@ h3 { font-family: var(--font-body); font-weight: 600; font-size: 21px; line-heig
 .ladder-legend { display: flex; gap: var(--s5); margin-top: var(--s4); flex-wrap: wrap; }
 .ladder-legend span { display: inline-flex; align-items: center; gap: var(--s2); font-size: 13px; color: var(--ink-muted); }
 .dotk { width: 9px; height: 9px; border-radius: 50%; display: inline-block; }
+.ladder-systems { display: grid; grid-template-columns: repeat(2, 1fr); gap: var(--s3); }
+.ladder-card { background: var(--paper); border-radius: var(--r-inner); padding: var(--s4); }
+.ladder-card .lc-name { font-weight: 600; font-size: 15px; color: var(--navy); }
+.ladder-card .lc-sub { font-size: 12px; color: var(--ink-muted); margin: 2px 0 14px; }
+.ladder-card svg { width: 100%; height: auto; display: block; }
+@media (max-width: 700px) { .ladder-systems { grid-template-columns: 1fr; } }
 
 /* ───────── holders (canto III) ───────── */
 .holders-grid { display: grid; grid-template-columns: 1fr 1fr; gap: var(--s6); align-items: center; }

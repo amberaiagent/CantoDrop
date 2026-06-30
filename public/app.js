@@ -137,6 +137,41 @@ $("presets").addEventListener("click", (e) => {
 $("capMode").addEventListener("change", () => { syncCapMode(); computePreview(); });
 syncCapMode();
 
+// ── ladder section: gallery of standard distribution systems ────────────
+const LADDER_SYSTEMS = [
+  { name: "Halving 50% ×2", sub: "fast taper, fewer rounds", rounds: 5, split: 50, basis: "remaining" },
+  { name: "10 × 10%", sub: "flat, 10 even rounds", rounds: 10, split: 10, basis: "total" },
+  { name: "5 × 20%", sub: "flat, 5 even rounds", rounds: 5, split: 20, basis: "total" },
+  { name: "20 × 5% gentle", sub: "soft taper, easy on the chart", rounds: 20, split: 5, basis: "remaining" },
+];
+function miniSchedule(s) {
+  const rows = []; let rem = 100; const p = s.split / 100;
+  for (let i = 0; i < s.rounds; i++) { let d = s.basis === "total" ? 100 * p : rem * p; if (d > rem) d = rem; rows.push(d); rem -= d; }
+  return rows;
+}
+function miniBars(rows) {
+  const max = Math.max(...rows, 1); const n = rows.length;
+  const W = 320, H = 120, padB = 16, padT = 16;
+  const gap = n > 10 ? 2 : 5; const bw = (W - gap * (n - 1)) / n;
+  let s = `<line x1="0" y1="${H - padB}" x2="${W}" y2="${H - padB}" stroke="var(--line-strong)" stroke-width="1"/>`;
+  rows.forEach((d, i) => {
+    const h = (d / max) * (H - padB - padT); const x = i * (bw + gap); const y = H - padB - h;
+    s += `<rect class="ld-fill" x="${x.toFixed(1)}" y="${y.toFixed(1)}" width="${Math.max(bw, 1).toFixed(1)}" height="${Math.max(h, 1).toFixed(1)}" rx="2"/>`;
+    if (n <= 10) {
+      s += `<circle class="ld-snapshot" cx="${(x + bw / 2).toFixed(1)}" cy="${y.toFixed(1)}" r="3"/>`;
+      s += `<text class="ld-label" x="${(x + bw / 2).toFixed(1)}" y="${(y - 5).toFixed(1)}" text-anchor="middle">${Math.round(d)}%</text>`;
+    }
+  });
+  return `<svg viewBox="0 0 ${W} ${H}" role="img">${s}</svg>`;
+}
+function renderLadderSystems() {
+  const el = $("ladder-systems"); if (!el) return;
+  el.innerHTML = LADDER_SYSTEMS.map((s) =>
+    `<div class="ladder-card"><div class="lc-name">${s.name}</div><div class="lc-sub">${s.sub}</div>${miniBars(miniSchedule(s))}</div>`
+  ).join("");
+}
+renderLadderSystems();
+
 // ── supply ⇄ percent linking ────────────────────────────────────────────
 // Most tokens are 1,000,000,000 supply (so 10,000,000 = 1%). If the CA resolves
 // to a real total supply, we use that instead.

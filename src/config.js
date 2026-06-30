@@ -5,10 +5,10 @@ export const DEPOSIT_WALLET =
   process.env.DEPOSIT_WALLET || "76Ex3DWvSnXwozo1rHDeKys5KA8mzbjSV9LMy1nmHCbT";
 
 export const DEFAULTS = {
-  // Every holder from #1 to #200 is included; the bot always skips the
-  // liquidity-pool wallet. Range is overridable up to #1000.
+  // Every holder from #1 to #1000 is included; the bot always skips the
+  // liquidity-pool wallet. Range is overridable (up to #1000).
   holderTopFrom: 1,
-  holderTopTo: 200,
+  holderTopTo: 1000,
 
   // Distribution across rounds.
   rounds: 5,                 // how many drop rounds

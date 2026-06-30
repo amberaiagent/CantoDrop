@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>trench · no cap, just drops</title>
-  <meta name="description" content="Automated, market-cap-triggered token drops on Solana. Pick a supply amount and a target cap — holders #1–#200 get an even cut, then again at every ×2." />
+  <meta name="description" content="Automated, market-cap-triggered token drops on Solana. Pick a supply amount and a target cap — holders #1–#1000 get an even cut, then again at every ×2." />
   <link rel="icon" type="image/png" href="/favicon.png" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -37,7 +37,7 @@
         <div>
           <div class="hero-tag"><span class="pulse"></span> Solana · automated drops</div>
           <h1>No cap,<br/>just drops.</h1>
-          <p class="lede">Pick how much supply to drop and a target market cap. Hit it, and holders <b>#1–#200</b> get an even cut, then again at every <b>×2</b>. Transparent pool, public dashboard.</p>
+          <p class="lede">Pick how much supply to drop and a target market cap. Hit it, and holders <b>#1–#1000</b> get an even cut, then again at every <b>×2</b>. Transparent pool, public dashboard.</p>
           <div class="hero-cta">
             <a href="#create" class="btn btn-primary">Create an order</a>
             <a href="#pool" class="btn btn-ghost">View live pool</a>
@@ -102,7 +102,7 @@
         <div class="step">
           <svg class="step-i ladder-mark" viewBox="0 0 40 32" style="height:30px"><circle class="dot" cx="8" cy="8" r="3"/><rect class="bar" x="4" y="14" width="8" height="16" rx="1"/><circle class="dot" cx="30" cy="8" r="3"/><rect class="bar" x="26" y="14" width="8" height="16" rx="1"/></svg>
           <h3>Snapshot + drop</h3>
-          <p>At the cap, holders #1–#200 (minus the LP) are snapshotted and split an even cut. At every ×2 after, a fresh snapshot and the next half of what's left.</p>
+          <p>At the cap, holders #1–#1000 (minus the LP) are snapshotted and split an even cut. At every ×2 after, a fresh snapshot and the next half of what's left.</p>
         </div>
       </div>
     </section>
@@ -116,37 +116,13 @@
           <h2>Every ×2 is a new round.</h2>
         </div>
       </div>
-      <p class="muted" style="max-width:62ch;margin:0 0 24px">
-        The cap climbs in doublings. Each rung fires a new <b style="color:var(--navy);font-weight:500">round</b> that snapshots holders again and drops the next portion of the supply. Default is 50% of the remaining balance per round, so payouts taper as the cap grows.
+      <p class="muted" style="max-width:64ch;margin:0 0 28px">
+        Each round snapshots holders again and drops a slice of the supply at the next cap step. You choose the <b style="color:var(--navy);font-weight:500">shape</b> — a fast halving, flat even rounds, or a gentle taper that's easy on the chart. A few standard systems:
       </p>
-      <div class="ladder-wrap">
-        <svg class="ladder-diagram" viewBox="0 0 800 300" role="img" aria-label="Distribution per round">
-          <line x1="20" y1="270" x2="780" y2="270" stroke="var(--hairline-strong)" stroke-width="1"/>
-          <rect class="ld-fill" x="40"  y="40"  width="120" height="230"/>
-          <rect class="ld-fill" x="200" y="155" width="120" height="115"/>
-          <rect class="ld-fill" x="360" y="212" width="120" height="58"/>
-          <rect class="ld-fill" x="520" y="241" width="120" height="29"/>
-          <rect class="ld-fill" x="680" y="241" width="120" height="29"/>
-          <circle class="ld-snapshot" cx="100" cy="40"  r="5"/>
-          <circle class="ld-snapshot" cx="260" cy="155" r="5"/>
-          <circle class="ld-snapshot" cx="420" cy="212" r="5"/>
-          <circle class="ld-snapshot" cx="580" cy="241" r="5"/>
-          <circle class="ld-snapshot" cx="740" cy="241" r="5"/>
-          <text class="ld-canto" x="100" y="292" text-anchor="middle">Round 1</text>
-          <text class="ld-canto" x="260" y="292" text-anchor="middle">Round 2</text>
-          <text class="ld-canto" x="420" y="292" text-anchor="middle">Round 3</text>
-          <text class="ld-canto" x="580" y="292" text-anchor="middle">Round 4</text>
-          <text class="ld-canto" x="740" y="292" text-anchor="middle">Round 5</text>
-          <text class="ld-label" x="100" y="32"  text-anchor="middle">50%</text>
-          <text class="ld-label" x="260" y="147" text-anchor="middle">25%</text>
-          <text class="ld-label" x="420" y="204" text-anchor="middle">12.5%</text>
-          <text class="ld-label" x="580" y="233" text-anchor="middle">6.25%</text>
-          <text class="ld-label" x="740" y="233" text-anchor="middle">rest</text>
-        </svg>
-        <div class="ladder-legend">
-          <span><i class="dotk" style="background:var(--canto-blue)"></i> snapshot + drop</span>
-          <span><i class="dotk" style="background:var(--canto-blue-dim)"></i> portion of the supply</span>
-        </div>
+      <div class="ladder-systems" id="ladder-systems"></div>
+      <div class="ladder-legend" style="margin-top:18px">
+        <span><i class="dotk" style="background:var(--canto-blue)"></i> drop per round</span>
+        <span>bar height = portion of the supply that round</span>
       </div>
     </section>
 
@@ -161,17 +137,17 @@
       </div>
       <div class="holders-grid">
         <div>
-          <p>Every holder from <b>#1 to #200</b> is in. The only wallet skipped is the <b>liquidity pool</b>, because dropping tokens back into the LP isn't a reward to anyone.</p>
-          <p>The cut is split <b>evenly</b>, so a rank-1 wallet and a rank-200 wallet receive the same. No weighting, no games.</p>
-          <p class="caption" style="margin-top:24px">The range is configurable per order in advanced settings, but the default #1 to #200 is the platform norm.</p>
+          <p>Every holder from <b>#1 to #1000</b> is in. The only wallet skipped is the <b>liquidity pool</b>, because dropping tokens back into the LP isn't a reward to anyone.</p>
+          <p>The cut is split <b>evenly</b>, so a rank-1 wallet and a rank-1000 wallet receive the same. No weighting, no games.</p>
+          <p class="caption" style="margin-top:24px">The range is configurable per order in advanced settings, but the default #1 to #1000 is the platform norm.</p>
         </div>
         <div class="rank-viz">
           <div class="rank-row rank-excluded"><span class="rk">LP</span><span class="rank-bar" style="max-width:55%"></span></div>
           <div class="rank-row rank-included"><span class="rk">#1</span><span class="rank-bar"></span></div>
-          <div class="rank-row rank-included"><span class="rk">#60</span><span class="rank-bar"></span></div>
-          <div class="rank-row rank-included"><span class="rk">#120</span><span class="rank-bar"></span></div>
-          <div class="rank-row rank-included"><span class="rk">#200</span><span class="rank-bar"></span></div>
-          <div class="rank-row rank-excluded"><span class="rk">#201+</span><span class="rank-bar" style="max-width:40%"></span></div>
+          <div class="rank-row rank-included"><span class="rk">#250</span><span class="rank-bar"></span></div>
+          <div class="rank-row rank-included"><span class="rk">#500</span><span class="rank-bar"></span></div>
+          <div class="rank-row rank-included"><span class="rk">#1000</span><span class="rank-bar"></span></div>
+          <div class="rank-row rank-excluded"><span class="rk">#1001+</span><span class="rank-bar" style="max-width:40%"></span></div>
         </div>
       </div>
     </section>
@@ -227,7 +203,7 @@
               </div>
               <div class="row">
                 <div class="field"><label for="holderTopFrom">Holders from rank</label><input id="holderTopFrom" name="holderTopFrom" inputmode="numeric" placeholder="1" /><small class="err" data-err="holderTopFrom"></small></div>
-                <div class="field"><label for="holderTopTo">Holders to rank <span class="opt">(max 1000)</span></label><input id="holderTopTo" name="holderTopTo" inputmode="numeric" placeholder="200" /><small class="err" data-err="holderTopTo"></small></div>
+                <div class="field"><label for="holderTopTo">Holders to rank <span class="opt">(max 1000)</span></label><input id="holderTopTo" name="holderTopTo" inputmode="numeric" placeholder="1000" /><small class="err" data-err="holderTopTo"></small></div>
               </div>
               <div class="row">
                 <div class="field"><label for="rounds">Number of rounds</label><input id="rounds" name="rounds" inputmode="numeric" placeholder="5" /><small class="err" data-err="rounds"></small></div>
@@ -305,7 +281,7 @@
       </div>
       <div class="faq">
         <details open><summary>How does a deposit reach my order?</summary><p>You send the supply to one public pool wallet and include the memo code we give you. The bot matches the incoming transfer by that memo and your token's mint, then marks the order funded.</p></details>
-        <details><summary>Which holders are included in a snapshot?</summary><p>Every holder ranked #1 to #200 at snapshot time. The only wallet excluded is the liquidity pool, so the drop never just recycles tokens back into the LP. The range is adjustable per order in advanced settings.</p></details>
+        <details><summary>Which holders are included in a snapshot?</summary><p>Every holder ranked #1 to #1000 at snapshot time. The only wallet excluded is the liquidity pool, so the drop never just recycles tokens back into the LP. The range is adjustable per order in advanced settings.</p></details>
         <details><summary>What does "every ×2" mean exactly?</summary><p>After the first snapshot at your target cap, a new round fires each time the market cap doubles. Each round takes a fresh holder snapshot and drops the next portion (50% of the remaining balance by default).</p></details>
         <details><summary>Is anything custodial?</summary><p>The supply sits in the public pool wallet until its rounds fire. Every order and its rounds are visible on the live pool, so nothing happens off the books.</p></details>
         <details><summary>Do I need to connect a wallet?</summary><p>No. You create the order with just the CA and send the supply manually with the memo. No signing on the site.</p></details>
