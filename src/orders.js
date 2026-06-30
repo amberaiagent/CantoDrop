@@ -33,8 +33,12 @@ export async function createOrder(input) {
     target_market_cap: input.targetMarketCap,
     holder_top_from: input.holderTopFrom,
     holder_top_to: input.holderTopTo,
-    cap_multiplier: input.capMultiplier,
+    rounds: input.rounds,
     split_percent: input.splitPercent,
+    split_basis: input.splitBasis,
+    cap_mode: input.capMode,
+    cap_multiplier: input.capMultiplier,
+    cap_step: input.capStep,
     deposit_wallet: DEPOSIT_WALLET,
     status: "pending",
     // updated by the bot once it sees on-chain activity
@@ -84,21 +88,31 @@ export async function updateOrder(reference, fields = {}) {
 }
 
 /**
- * Build a preview of the milestone schedule for the confirmation screen.
- * Each milestone (a "canto"): cap doubles (×capMultiplier), a fresh top-holder
- * snapshot is taken, and splitPercent of the *remaining* deposit is distributed.
+ * Build the per-round drop schedule for the preview / confirmation / token page.
+ *
+ * Each round: a fresh top-holder snapshot is taken at the round's market cap, and
+ * a slice of the supply is distributed. Two knobs control the shape:
+ *   splitBasis "remaining" → drop = splitPercent% of the current balance (tapers)
+ *   splitBasis "total"     → drop = splitPercent% of the original locked amount (flat)
+ *   capMode "multiply"     → cap_i = targetCap × capMultiplier^i
+ *   capMode "step"         → cap_i = targetCap + capStep × i
  */
 export function milestonePreview(order) {
   const deposit = Number(order.deposit_amount ?? order.depositAmount);
   const targetCap = Number(order.target_market_cap ?? order.targetMarketCap);
-  const mult = Number(order.cap_multiplier ?? order.capMultiplier);
+  const rounds = Math.min(Number(order.rounds ?? order.roundsCount ?? 5), LIMITS.maxRoundsPreview);
   const split = Number(order.split_percent ?? order.splitPercent) / 100;
+  const basis = (order.split_basis ?? order.splitBasis ?? "remaining");
+  const capMode = (order.cap_mode ?? order.capMode ?? "multiply");
+  const mult = Number(order.cap_multiplier ?? order.capMultiplier ?? 2);
+  const step = Number(order.cap_step ?? order.capStep ?? 0);
 
   const rows = [];
   let remaining = deposit;
-  let cap = targetCap;
-  for (let i = 0; i < LIMITS.maxMilestonesPreview && remaining > 0.0000001; i++) {
-    const drop = i === LIMITS.maxMilestonesPreview - 1 ? remaining : remaining * split;
+  for (let i = 0; i < rounds && remaining > 0.0000001; i++) {
+    const cap = capMode === "step" ? targetCap + step * i : targetCap * Math.pow(mult, i);
+    let drop = basis === "total" ? deposit * split : remaining * split;
+    if (drop > remaining) drop = remaining; // never overshoot the balance
     rows.push({
       milestone: i + 1,
       marketCap: cap,
@@ -106,7 +120,6 @@ export function milestonePreview(order) {
       remainingAfter: Math.max(remaining - drop, 0),
     });
     remaining -= drop;
-    cap *= mult;
   }
   return rows;
 }

@@ -218,14 +218,40 @@
 
             <details class="advanced">
               <summary>Advanced distribution</summary>
-              <p class="caption" style="margin:0 0 12px">Defaults follow the platform rules. Override only if you know what you want.</p>
-              <div class="row">
-                <div class="field"><label for="holderTopFrom">Holders from rank</label><input id="holderTopFrom" name="holderTopFrom" inputmode="numeric" placeholder="1" /><small class="err" data-err="holderTopFrom"></small></div>
-                <div class="field"><label for="holderTopTo">Holders to rank</label><input id="holderTopTo" name="holderTopTo" inputmode="numeric" placeholder="200" /><small class="err" data-err="holderTopTo"></small></div>
+              <p class="caption" style="margin:0 0 10px">Pick a preset or tune it yourself. Default: 5 rounds, 50% of remaining, ×2 cap.</p>
+              <div class="presets" id="presets">
+                <button type="button" class="chip" data-preset="halving">Halving 50% ×2</button>
+                <button type="button" class="chip" data-preset="eq10">10 × 10%</button>
+                <button type="button" class="chip" data-preset="eq5">5 × 20%</button>
+                <button type="button" class="chip" data-preset="gentle">20 × 5% gentle</button>
               </div>
               <div class="row">
-                <div class="field"><label for="capMultiplier">Cap multiplier</label><input id="capMultiplier" name="capMultiplier" inputmode="decimal" placeholder="2" /><small class="err" data-err="capMultiplier"></small></div>
-                <div class="field"><label for="splitPercent">% of remaining / round</label><input id="splitPercent" name="splitPercent" inputmode="decimal" placeholder="50" /><small class="err" data-err="splitPercent"></small></div>
+                <div class="field"><label for="holderTopFrom">Holders from rank</label><input id="holderTopFrom" name="holderTopFrom" inputmode="numeric" placeholder="1" /><small class="err" data-err="holderTopFrom"></small></div>
+                <div class="field"><label for="holderTopTo">Holders to rank <span class="opt">(max 1000)</span></label><input id="holderTopTo" name="holderTopTo" inputmode="numeric" placeholder="200" /><small class="err" data-err="holderTopTo"></small></div>
+              </div>
+              <div class="row">
+                <div class="field"><label for="rounds">Number of rounds</label><input id="rounds" name="rounds" inputmode="numeric" placeholder="5" /><small class="err" data-err="rounds"></small></div>
+                <div class="field"><label for="splitPercent">% dropped per round</label><input id="splitPercent" name="splitPercent" inputmode="decimal" placeholder="50" /><small class="err" data-err="splitPercent"></small></div>
+              </div>
+              <div class="row">
+                <div class="field">
+                  <label for="splitBasis">Percent is of…</label>
+                  <select id="splitBasis" name="splitBasis">
+                    <option value="remaining">remaining balance (tapers)</option>
+                    <option value="total">total locked (flat)</option>
+                  </select>
+                </div>
+                <div class="field">
+                  <label for="capMode">Cap progression</label>
+                  <select id="capMode" name="capMode">
+                    <option value="multiply">× multiply</option>
+                    <option value="step">+ step (USD)</option>
+                  </select>
+                </div>
+              </div>
+              <div class="row">
+                <div class="field" id="mult-field"><label for="capMultiplier">Cap multiplier (×)</label><input id="capMultiplier" name="capMultiplier" inputmode="decimal" placeholder="2" /><small class="err" data-err="capMultiplier"></small></div>
+                <div class="field" id="step-field" hidden><label for="capStep">Cap step (USD)</label><input id="capStep" name="capStep" inputmode="numeric" placeholder="100000" /><small class="err" data-err="capStep"></small></div>
               </div>
             </details>
 

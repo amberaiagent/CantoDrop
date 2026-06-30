@@ -86,7 +86,8 @@
           <dt>Target market cap</dt><dd>${fmtUsd(o.targetMarketCap)}</dd>
           ${Number(o.currentMarketCap) > 0 ? `<dt>Current market cap</dt><dd>${fmtUsd(o.currentMarketCap)}</dd>` : ""}
           <dt>Holder range</dt><dd>#${o.holderTopFrom}–#${o.holderTopTo}, even split</dd>
-          <dt>Snapshot step</dt><dd>×${o.capMultiplier} of cap · ${o.splitPercent}% of remaining each round</dd>
+          <dt>Rounds</dt><dd>${o.rounds} × ${o.splitPercent}% ${o.splitBasis === 'total' ? 'of total locked' : 'of remaining'}</dd>
+          <dt>Cap progression</dt><dd>${o.capMode === 'step' ? `+${fmtUsd(o.capStep)} per round` : `×${o.capMultiplier} per round`}</dd>
           <dt>Pool wallet</dt><dd>${o.depositWallet}</dd>
           <dt>Created</dt><dd>${new Date(o.createdAt).toLocaleString()}</dd>
         </dl>

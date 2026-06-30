@@ -41,39 +41,101 @@ fetch("/api/config").then((r) => r.json()).then((cfg) => {
   document.querySelectorAll(".mult-echo").forEach((e) => (e.textContent = d.capMultiplier));
 }).catch(() => {});
 
-// ── live canto-schedule preview (mirrors the server formula) ────────────
-function computePreview() {
+// ── live drop-schedule preview (mirrors the server formula) ─────────────
+function computeSchedule() {
   const d = readForm();
   const deposit = Number(String(d.depositAmount).replace(/[, _]/g, ""));
   const cap0 = Number(String(d.targetMarketCap).replace(/[, _$]/g, ""));
-  const mult = Number(d.capMultiplier || CONFIG.defaults.capMultiplier);
+  const rounds = Math.min(Math.max(parseInt(d.rounds, 10) || CONFIG.defaults.rounds || 5, 1), 30);
   const split = Number(d.splitPercent || CONFIG.defaults.splitPercent) / 100;
+  const basis = d.splitBasis || CONFIG.defaults.splitBasis || "remaining";
+  const capMode = d.capMode || CONFIG.defaults.capMode || "multiply";
+  const mult = Number(d.capMultiplier || CONFIG.defaults.capMultiplier || 2);
+  const step = Number(String(d.capStep || "").replace(/[, _$]/g, "")) || CONFIG.defaults.capStep || 0;
 
-  if (!(deposit > 0) || !(cap0 > 0) || !(mult > 1) || !(split > 0)) {
+  if (!(deposit > 0) || !(cap0 > 0) || !(split > 0)) return null;
+
+  const rows = [];
+  let remaining = deposit;
+  for (let i = 0; i < rounds && remaining > 1e-7; i++) {
+    const cap = capMode === "step" ? cap0 + step * i : cap0 * Math.pow(mult, i);
+    let drop = basis === "total" ? deposit * split : remaining * split;
+    if (drop > remaining) drop = remaining;
+    rows.push({ m: i + 1, cap, drop, rem: Math.max(remaining - drop, 0) });
+    remaining -= drop;
+  }
+  return rows;
+}
+
+function computePreview() {
+  const rows = computeSchedule();
+  if (!rows || !rows.length) {
     previewBody.innerHTML = '<p class="preview-empty">Enter supply and a target cap to preview the rounds.</p>';
     return;
   }
-  const MAX = 6;
-  let remaining = deposit, cap = cap0;
-  const rows = [];
-  for (let i = 0; i < MAX && remaining > 1e-7; i++) {
-    const drop = i === MAX - 1 ? remaining : remaining * split;
-    rows.push({ m: i + 1, cap, drop, rem: Math.max(remaining - drop, 0) });
-    remaining -= drop; cap *= mult;
-  }
-  previewBody.innerHTML = rows.map((r) => `
-    <div class="mile">
-      <div>
-        <div class="m-canto">Round ${r.m}</div>
-        <div class="m-cap">at ${fmtUsd(r.cap)} cap</div>
-      </div>
-      <div>
-        <div class="m-amt">${fmt(r.drop)}</div>
-        <div class="m-rem">${fmt(r.rem)} left</div>
-      </div>
-    </div>`).join("");
+  renderInfographic(rows);
 }
+
+// bar-chart infographic of the per-round drop amounts
+function renderInfographic(rows) {
+  const max = Math.max(...rows.map((r) => r.drop), 1);
+  const total = rows.reduce((s, r) => s + r.drop, 0);
+  const n = rows.length;
+  const W = 560, H = 178, padB = 24, padT = 8;
+  const gap = n > 16 ? 2 : n > 10 ? 4 : 6;
+  const bw = (W - gap * (n - 1)) / n;
+  let bars = "";
+  rows.forEach((r, i) => {
+    const h = (r.drop / max) * (H - padB - padT);
+    const x = i * (bw + gap), y = H - padB - h;
+    bars += `<rect class="ld-fill" x="${x.toFixed(1)}" y="${y.toFixed(1)}" width="${Math.max(bw, 1).toFixed(1)}" height="${Math.max(h, 1).toFixed(1)}" rx="2"><title>Round ${r.m}: ${fmt(r.drop)} @ ${fmtUsd(r.cap)}</title></rect>`;
+    if (n <= 14) bars += `<text class="ld-label" x="${(x + bw / 2).toFixed(1)}" y="${H - padB + 15}" text-anchor="middle">${r.m}</text>`;
+  });
+  const shown = rows.length > 6 ? rows.slice(0, 5) : rows;
+  const list = shown.map((r) =>
+    `<div class="mile"><div><div class="m-canto">Round ${r.m}</div><div class="m-cap">at ${fmtUsd(r.cap)} cap</div></div><div><div class="m-amt">${fmt(r.drop)}</div><div class="m-rem">${fmt(r.rem)} left</div></div></div>`
+  ).join("") + (rows.length > 6 ? `<div class="caption" style="padding-top:10px">+ ${rows.length - 5} more rounds</div>` : "");
+  const leftover = rows[rows.length - 1].rem;
+  previewBody.innerHTML = `
+    <svg viewBox="0 0 ${W} ${H}" style="width:100%;height:auto;display:block;margin-bottom:10px" role="img" aria-label="Drop schedule">
+      <line x1="0" y1="${H - padB}" x2="${W}" y2="${H - padB}" stroke="var(--line-strong)" stroke-width="1"/>
+      ${bars}
+    </svg>
+    <div class="caption" style="margin-bottom:8px">${n} rounds · ${fmt(total)} tokens dropped${leftover > 0.5 ? ` · ${fmt(leftover)} left in pool` : ""}</div>
+    ${list}`;
+}
+
 form.addEventListener("input", computePreview);
+
+// ── advanced: presets + cap-mode toggle ─────────────────────────────────
+const PRESETS = {
+  halving: { rounds: 6, splitPercent: 50, splitBasis: "remaining", capMode: "multiply", capMultiplier: 2 },
+  eq10:    { rounds: 10, splitPercent: 10, splitBasis: "total", capMode: "step", capStep: 50000 },
+  eq5:     { rounds: 5, splitPercent: 20, splitBasis: "total", capMode: "multiply", capMultiplier: 2 },
+  gentle:  { rounds: 20, splitPercent: 5, splitBasis: "remaining", capMode: "step", capStep: 50000 },
+};
+function syncCapMode() {
+  const mode = $("capMode").value;
+  $("mult-field").hidden = mode !== "multiply";
+  $("step-field").hidden = mode !== "step";
+}
+$("presets").addEventListener("click", (e) => {
+  const btn = e.target.closest("[data-preset]");
+  if (!btn) return;
+  const p = PRESETS[btn.dataset.preset];
+  if (!p) return;
+  $("rounds").value = p.rounds;
+  $("splitPercent").value = p.splitPercent;
+  $("splitBasis").value = p.splitBasis;
+  $("capMode").value = p.capMode;
+  if (p.capMultiplier != null) $("capMultiplier").value = p.capMultiplier;
+  if (p.capStep != null) $("capStep").value = p.capStep;
+  document.querySelectorAll("#presets .chip").forEach((c) => c.classList.toggle("active", c === btn));
+  syncCapMode();
+  computePreview();
+});
+$("capMode").addEventListener("change", () => { syncCapMode(); computePreview(); });
+syncCapMode();
 
 // ── supply ⇄ percent linking ────────────────────────────────────────────
 // Most tokens are 1,000,000,000 supply (so 10,000,000 = 1%). If the CA resolves
@@ -198,7 +260,8 @@ function openConfirm({ order, deposit, preview }) {
     ${ci("Contract (CA)", order.tokenMint)}
     ${ci("Supply to send", fmt(deposit.amount) + " tokens")}
     ${ci("Target cap", fmtUsd(order.targetMarketCap))}
-    ${ci("Holders", `#${order.holderTopFrom}–#${order.holderTopTo} · ×${order.capMultiplier}`)}
+    ${ci("Holders", `#${order.holderTopFrom}–#${order.holderTopTo}`)}
+    ${ci("Rounds", `${order.rounds} × ${order.splitPercent}% ${order.splitBasis === "total" ? "of total" : "of rem."}`)}
   `;
   $("cb-wallet").textContent = deposit.wallet;
   $("cb-memo").textContent = deposit.memo;

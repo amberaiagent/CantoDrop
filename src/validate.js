@@ -66,13 +66,29 @@ export function parseOrderInput(body = {}) {
     throw new ValidationError("holderTopTo", "Top-to must be greater than top-from.");
   }
 
-  const capMultiplier = body.capMultiplier == null || body.capMultiplier === ""
-    ? DEFAULTS.capMultiplier
-    : num(body.capMultiplier, "capMultiplier", { min: LIMITS.capMultiplierMin, max: LIMITS.capMultiplierMax });
+  const rounds = body.rounds == null || body.rounds === ""
+    ? DEFAULTS.rounds
+    : num(body.rounds, "rounds", { min: LIMITS.roundsMin, max: LIMITS.roundsMax, integer: true });
 
   const splitPercent = body.splitPercent == null || body.splitPercent === ""
     ? DEFAULTS.splitPercent
     : num(body.splitPercent, "splitPercent", { min: LIMITS.splitPercentMin, max: LIMITS.splitPercentMax });
+
+  const splitBasis = body.splitBasis === "total" ? "total"
+    : body.splitBasis === "remaining" ? "remaining"
+    : DEFAULTS.splitBasis;
+
+  const capMode = body.capMode === "step" ? "step"
+    : body.capMode === "multiply" ? "multiply"
+    : DEFAULTS.capMode;
+
+  const capMultiplier = body.capMultiplier == null || body.capMultiplier === ""
+    ? DEFAULTS.capMultiplier
+    : num(body.capMultiplier, "capMultiplier", { min: LIMITS.capMultiplierMin, max: LIMITS.capMultiplierMax });
+
+  const capStep = body.capStep == null || body.capStep === ""
+    ? DEFAULTS.capStep
+    : num(String(body.capStep).replace(/[, _$]/g, ""), "capStep", { min: LIMITS.capStepMin });
 
   return {
     tokenMint,
@@ -81,8 +97,12 @@ export function parseOrderInput(body = {}) {
     targetMarketCap,
     holderTopFrom,
     holderTopTo,
-    capMultiplier,
+    rounds,
     splitPercent,
+    splitBasis,
+    capMode,
+    capMultiplier,
+    capStep,
   };
 }
 
